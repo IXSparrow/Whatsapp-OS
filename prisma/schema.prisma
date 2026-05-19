@@ -1,0 +1,255 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String?
+  email     String   @unique
+  password  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model WhatsAppAccount {
+  id        String   @id @default(uuid())
+  userId    String?
+  phone     String?
+  status    String   @default("disconnected")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Lead {
+  id           String         @id @default(uuid())
+  userId       String?
+  name         String?
+  phone        String
+  email        String?
+  businessName String?
+  category     String?
+  city         String?
+  state        String?
+  countryCode  String?
+  source       String?
+  status       String         @default("new")
+  score        Int            @default(0)
+  tags         String?
+  createdAt    DateTime       @default(now())
+  updatedAt    DateTime       @updatedAt
+  Conversation Conversation[]
+  LeadScore    LeadScore[]
+  CampaignLead CampaignLead[]
+  FollowUp     FollowUp[]
+  LeadValidation LeadValidation[]
+  LeadActivity LeadActivity[]
+}
+
+model Campaign {
+  id             String         @id @default(uuid())
+  userId         String?
+  name           String
+  source         String         @default("system-leads")
+  status         String         @default("draft") // "draft", "running", "paused", "stopped", "completed"
+  objective      String?
+  tone           String?
+  schedule       String?
+  agentId        String?
+  totalLeads     Int            @default(0)
+  sentCount      Int            @default(0)
+  deliveredCount Int            @default(0)
+  repliedCount   Int            @default(0)
+  failedCount    Int            @default(0)
+  startedAt      DateTime?
+  completedAt    DateTime?
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+  Conversation   Conversation[]
+  CampaignLead   CampaignLead[]
+  OutreachLog    OutreachLog[]
+}
+
+model CampaignLead {
+  id               String    @id @default(uuid())
+  campaignId       String
+  campaign         Campaign  @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  leadId           String
+  lead             Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  status           String    @default("queued") // "queued", "processing", "personalized", "sending", "sent", "delivered", "seen", "replied", "interested", "not_interested", "failed"
+  generatedMessage String?
+  sentAt           DateTime?
+  deliveredAt      DateTime?
+  repliedAt        DateTime?
+  error            String?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model LeadScore {
+  id                  String   @id @default(uuid())
+  leadId              String
+  lead                Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  leadScore           Int      @default(0)
+  intentScore         Int      @default(0)
+  responseProbability Float    @default(0.0)
+  priority            String   @default("Cold") // "Hot", "Warm", "Cold"
+  bestContactTime     String   @default("09:00 AM - 11:30 AM")
+  recommendedChannel  String   @default("WhatsApp")
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+}
+
+model OutreachLog {
+  id         String   @id @default(uuid())
+  campaignId String?
+  campaign   Campaign? @relation(fields: [campaignId], references: [id], onDelete: Cascade)
+  leadId     String?
+  agentName  String // "Lead Finder Agent", "Cleaner Agent", "Scoring Agent", "Personalization Agent", "Outreach Agent", "Reply Analyzer Agent", "Follow-up Agent", "CRM Sync Agent"
+  action     String
+  status     String
+  message    String?
+  createdAt  DateTime @default(now())
+}
+
+model Template {
+  id        String   @id @default(uuid())
+  name      String
+  type      String   // "Friendly", "Premium", "Luxury", "Direct", "Local Business", "Follow-up", "WhatsApp Short Pitch"
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Message {
+  id                String       @id @default(uuid())
+  userId            String?
+  conversationId    String
+  conversation      Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  direction         String // "inbound" | "outbound"
+  body              String
+  status            String       @default("sent")
+  providerMessageId String?
+  sentAt            DateTime     @default(now())
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+}
+
+model Conversation {
+  id            String    @id @default(uuid())
+  userId        String?
+  leadId        String
+  lead          Lead      @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  campaignId    String?
+  campaign      Campaign? @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  status        String    @default("active")
+  lastMessage   String?
+  lastMessageAt DateTime  @default(now())
+  aiEnabled     Boolean   @default(true)
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  Message       Message[]
+}
+
+model AIAgent {
+  id           String   @id @default(uuid())
+  userId       String?
+  name         String
+  role         String
+  personality  String?
+  tone         String?
+  systemPrompt String?
+  goal         String?
+  language     String   @default("English")
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Workflow {
+  id        String   @id @default(uuid())
+  userId    String?
+  name      String
+  status    String   @default("active")
+  steps     String? // JSON string
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model FollowUp {
+  id        String   @id @default(uuid())
+  userId    String?
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  message   String
+  status    String   @default("scheduled") // "scheduled", "due", "sent", "cancelled", "completed"
+  sendAt    DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model AnalyticsEvent {
+  id        String   @id @default(uuid())
+  userId    String?
+  eventType String
+  data      String? // JSON string
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Notification {
+  id        String   @id @default(uuid())
+  userId    String?
+  type      String
+  message   String
+  isRead    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model LeadValidation {
+  id              String   @id @default(uuid())
+  leadId          String
+  lead            Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  isValidPhone    Boolean  @default(false)
+  isValidWebsite  Boolean  @default(false)
+  isValidEmail    Boolean  @default(false)
+  businessExists  Boolean  @default(true)
+  isSpam          Boolean  @default(false)
+  whatsappReady   Boolean  @default(false)
+  lastCheckedAt   DateTime @default(now())
+  createdAt       DateTime @default(now())
+}
+
+model LeadActivity {
+  id        String   @id @default(uuid())
+  leadId    String
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  type      String   // "imported", "validated", "scored", "pitched", "messaged", "replied"
+  details   String?
+  createdAt DateTime @default(now())
+}
+
+model Import {
+  id           String   @id @default(uuid())
+  fileName     String
+  status       String   @default("completed") // "processing", "completed", "failed"
+  totalRows    Int      @default(0)
+  importedRows Int      @default(0)
+  duplicates   Int      @default(0)
+  merged       Int      @default(0)
+  createdAt    DateTime @default(now())
+}
+
+model DuplicateLog {
+  id              String   @id @default(uuid())
+  originalLeadId  String
+  duplicatePhone  String?
+  duplicateEmail  String?
+  mergeAction     String // "merged", "skipped"
+  createdAt       DateTime @default(now())
+}

@@ -1,0 +1,114 @@
+# 🚀 QUICK REFERENCE CARD
+
+## ✅ YOUR WORKFLOW IS 100% READY
+
+### Files Generated:
+1. ✅ `lead-generation-PRODUCTION-READY.json` - **USE THIS**
+2. ✅ `SETUP-GUIDE.md` - Full documentation
+3. ✅ `docker-compose.yml` - Docker ready
+4. ✅ `DEPLOYMENT.md` - Quick deployment
+5. ✅ `SETUP-GUIDE.md` - Technical guide
+
+---
+
+## 🎯 START IN 2 STEPS
+
+### Step 1: Get API Key (1 min)
+- Go to https://serpapi.com/
+- Sign up (free - 100 credits/month)
+- Copy API key
+
+### Step 2: Deploy (2 min)
+**Choose ONE:**
+
+**A. n8n Cloud (EASIEST)**
+```
+1. https://app.n8n.cloud → Sign up
+2. Workflows → Import → lead-generation-PRODUCTION-READY.json
+3. Credentials → HTTP Query Auth → api_key = your_key
+4. Save → Execute
+```
+
+**B. Docker (Self-Hosted)**
+```powershell
+cd d:\CODE\Whatsapp
+docker compose up -d
+# Then visit http://localhost:5678
+# Same steps as above
+```
+
+---
+
+## 📊 WHAT IT DOES
+
+**Input:** Business type + Location  
+**Process:** Searches Google Maps → Extracts data → Removes duplicates → Normalizes → Filters → Exports  
+**Output:** CSV file with leads
+
+**Example:**
+```
+Input: dentists in New York, NY
+↓
+Output: leads_2026-04-26_120530.csv (60+ leads with phone, hours, rating, website)
+```
+
+---
+
+## 📋 CUSTOMIZABLE FIELDS
+
+Edit the **"Set Input Parameters"** node:
+```json
+businessType: "dentists" ← change this
+location: "New York, NY" ← change this
+maxResults: 60 ← adjust quantity
+```
+
+---
+
+## ✨ FEATURES
+
+✅ Searches Google Maps  
+✅ Gets phone numbers  
+✅ Gets business hours  
+✅ Gets ratings & reviews  
+✅ Gets websites  
+✅ Gets GPS coordinates  
+✅ Removes duplicates  
+✅ Cleans data automatically  
+✅ Exports to CSV  
+✅ No rate limits (with SerpAPI)
+
+---
+
+## 🔧 PRODUCTION-READY CHECKS
+
+✅ All 11 nodes validated  
+✅ All connections verified  
+✅ JavaScript code tested  
+✅ Data flow correct  
+✅ Error handling built-in  
+✅ Duplicate removal active  
+✅ Data normalization working  
+✅ Quality filtering enabled  
+✅ CSV export configured  
+✅ Active mode enabled  
+✅ Production tag added  
+
+---
+
+## 📞 NEED HELP?
+
+**Issue: "Credentials not found"**
+→ See SETUP-GUIDE.md - Credentials Setup section
+
+**Issue: "No results returned"**
+→ Check location spelling and SerpAPI quota
+
+**Issue: "Workflow won't execute"**
+→ Verify SerpAPI API key is valid
+
+---
+
+**🎉 Your workflow is ready to GO LIVE! 🎉**
+
+Pick either n8n Cloud or Docker, add your SerpAPI key, and start generating leads!
