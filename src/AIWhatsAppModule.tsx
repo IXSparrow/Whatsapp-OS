@@ -1465,7 +1465,7 @@ function LeadsView({ onNavigate }: { onNavigate?: (route: string) => void }) {
     fetchLeads();
     fetchDBLogs();
 
-    const socket = io();
+    const socket = io(import.meta.env.VITE_BACKEND_URL || window.location.origin);
 
     socket.on('lead-status-update', (data: any) => {
       setLeads(prev => prev.map(l => {
